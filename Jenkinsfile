@@ -2,64 +2,50 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3'
-        jdk 'JDK17'
-    }
-
-    environment {
-        APP_NAME = "my-maven-app"
+        maven 'Maven 3.9.16'
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Build') {
             steps {
-                checkout scm
-            }
-        }
-
-        stage('Clean') {
-            steps {
-                sh 'mvn clean'
-            }
-        }
-
-        stage('Compile') {
-            steps {
+                echo "Compiling the mamaven job"
                 sh 'mvn compile'
             }
         }
 
-        stage('Unit Test') {
+        stage('Test') {
             steps {
+                 echo "testing the mamaven test"
                 sh 'mvn test'
             }
         }
 
         stage('Package') {
             steps {
-                sh 'mvn package'
+                 echo "Package the mamaven job"
+                sh 'mvn package -DskipTests'
             }
         }
 
         stage('Archive Artifact') {
             steps {
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                archiveArtifacts artifacts: 'target/*.jar, target/*.war', fingerprint: true
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline completed.'
-        }
-
         success {
-            echo 'Build Successful!'
+            echo 'Pipeline completed successfully.'
         }
 
         failure {
-            echo 'Build Failed!'
+            echo 'Pipeline failed.'
+        }
+
+        always {
+            cleanWs()
         }
     }
 }
